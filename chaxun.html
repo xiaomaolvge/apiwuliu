@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="./jquery.js"></script>
+	<script>
+	//给按钮绑定单击事件
+	$(function(){
+		$('#btn').bind('click',function(){
+		var com = $("select").val();
+		var num = $("input[type=text]").val();
+		if (com =='') {
+			alert('请选择快递公司');
+		}
+		if (num =='') {
+			alert('请输入快递单号');
+		}
+		//开始发送ajax请求
+		$.ajax({
+			type:"POST",
+			url:"chaxun.php",
+			data:{"com":com,"num":num},
+			dataType:"json",
+			async:true,
+			success:function(data){
+			var list = data.result.list.reverse();  //获取快件物流信息，倒序显示
+			var html ="";
+			$.each(list,function(k,v){
+				console.log(k,v);
+				html+="<p>时间："+v.datetime+"----------地点："+v.remark+"</p>";
+			});
+				$('.info').html(html);
+			},
+			beforeSend:function(){
+				$('.info').html('正在玩命加载中.......');
+			},
+			complete:function(){
+				alert('查询成功');
+			},
+			error:function(){
+				$('.info').html('该单号没有物流信息');
+			}
+
+		});
+	});
+	});
+	</script>
+</head>
+<body>
+	<h2>快递单号查询</h2>
+	<div class="input">
+		快递公司：
+		<select name="" id="">
+			<option value="">请选择快递公司</option>
+			<option value="sf">顺丰</option>
+			<option value="sto">申通</option>
+			<option value="yt">圆通</option>
+			<option value="zto">中通</option>
+			<option value="yd">韵达</option>
+		</select>
+		订单号:
+		<input type="text" value="" placeholder="请输入快递单号">
+		<button id="btn">查询</button>
+	</div>
+	<div class="info">
+
+	</div>
+</body>
+</html>
